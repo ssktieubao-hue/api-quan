@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>In Vé - <%= ticket.TenPhim %></title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+      color: #333;
+    }
+
+    .print-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 40px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      border-radius: 12px;
+    }
+
+    .ticket-header {
+      text-align: center;
+      border-bottom: 3px solid #667eea;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+
+    .ticket-header h1 {
+      color: #667eea;
+      font-size: 32px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .ticket-header p {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .ticket-body {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .ticket-poster {
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .ticket-info {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .info-label {
+      font-weight: 600;
+      color: #667eea;
+      min-width: 120px;
+      font-size: 14px;
+    }
+
+    .info-value {
+      flex: 1;
+      font-size: 16px;
+      color: #333;
+    }
+
+    .ticket-seat {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .ticket-seat h2 {
+      font-size: 18px;
+      margin-bottom: 10px;
+      opacity: 0.9;
+    }
+
+    .ticket-seat .seat-number {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: 4px;
+    }
+
+    .ticket-footer {
+      border-top: 2px dashed #ddd;
+      padding-top: 20px;
+      margin-top: 30px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .footer-section {
+      text-align: center;
+    }
+
+    .footer-section h3 {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .footer-section p {
+      font-size: 14px;
+      color: #333;
+      font-weight: 600;
+    }
+
+    .ticket-qr {
+      text-align: center;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 12px;
+      margin-top: 20px;
+    }
+
+    .ticket-qr img {
+      width: 150px;
+      height: 150px;
+      margin: 10px auto;
+      display: block;
+    }
+
+    .ticket-qr p {
+      font-size: 12px;
+      color: #666;
+      margin-top: 10px;
+    }
+
+    .print-actions {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 2px solid #eee;
+    }
+
+    .btn {
+      padding: 12px 30px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 0 10px;
+      transition: all 0.3s;
+    }
+
+    .btn-print {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-print:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-back {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .btn-back:hover {
+      background: #e0e0e0;
+    }
+
+    /* Print styles */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+
+      .print-container {
+        box-shadow: none;
+        padding: 20px;
+        max-width: 100%;
+      }
+
+      .print-actions {
+        display: none;
+      }
+
+      .ticket-header {
+        page-break-after: avoid;
+      }
+
+      .ticket-body {
+        page-break-inside: avoid;
+      }
+
+      .ticket-seat {
+        page-break-inside: avoid;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .ticket-body {
+        grid-template-columns: 1fr;
+      }
+
+      .ticket-footer {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="print-container">
+    <!-- Header -->
+    <div class="ticket-header">
+      <h1>🎬 VÉ XEM PHIM</h1>
+      <p>Rạp Chiếu Phim</p>
+    </div>
+
+    <!-- Body -->
+    <div class="ticket-body">
+      <div>
+        <img src="<%= ticket.Anh || '/images/movies/default.jpg' %>" 
+             alt="<%= ticket.TenPhim %>" 
+             class="ticket-poster">
+      </div>
+      
+      <div class="ticket-info">
+        <div class="info-row">
+          <span class="info-label">🎬 Phim:</span>
+          <span class="info-value"><strong><%= ticket.TenPhim %></strong></span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">📅 Ngày chiếu:</span>
+          <span class="info-value">
+            <%= new Date(ticket.GioChieu).toLocaleDateString('vi-VN', {
+              weekday: 'long',
+              day: '2-digit',
+              month: 'long',
+              year: 'numeric'
+            }) %>
+          </span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">🕐 Giờ chiếu:</span>
+          <span class="info-value">
+            <strong><%= new Date(ticket.GioChieu).toLocaleTimeString('vi-VN', {
+              hour: '2-digit',
+              minute: '2-digit'
+            }) %></strong>
+          </span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">🏢 Phòng:</span>
+          <span class="info-value"><strong><%= ticket.TenPhong %></strong></span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">💰 Giá vé:</span>
+          <span class="info-value">
+            <strong style="color: #667eea;">
+              <%= Number(ticket.TongTien || ticket.GiaVe || 0).toLocaleString('vi-VN') %> VNĐ
+            </strong>
+          </span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">📝 Mã vé:</span>
+          <span class="info-value">#<%= ticket.MaVe %></span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">👤 Khách hàng:</span>
+          <span class="info-value"><%= ticket.TenKH || 'N/A' %></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seat Number -->
+    <div class="ticket-seat">
+      <h2>Ghế Ngồi</h2>
+      <div class="seat-number"><%= ticket.GheNgoi %></div>
+    </div>
+
+    <!-- Footer -->
+    <div class="ticket-footer">
+      <div class="footer-section">
+        <h3>Ngày mua</h3>
+        <p><%= new Date(ticket.NgayMua).toLocaleString('vi-VN') %></p>
+      </div>
+      <div class="footer-section">
+        <h3>Trạng thái</h3>
+        <p style="color: #51cf66;">✓ Đã thanh toán</p>
+      </div>
+    </div>
+
+    <!-- QR Code (optional) -->
+    <div class="ticket-qr">
+      <p><strong>Mã QR Vé</strong></p>
+      <div id="qrcode"></div>
+      <p>Quét mã QR để xác nhận vé</p>
+    </div>
+
+    <!-- Print Actions -->
+    <div class="print-actions">
+      <button class="btn btn-print" onclick="window.print()">
+        🖨️ In Vé
+      </button>
+      <button class="btn btn-back" onclick="window.close()">
+        ← Đóng
+      </button>
+    </div>
+  </div>
+
+  <!-- QR Code Library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script>
+    // Generate QR Code
+    const qrData = JSON.stringify({
+      MaVe: <%= ticket.MaVe %>,
+      MaLich: <%= ticket.MaLich %>,
+      GheNgoi: '<%= ticket.GheNgoi %>',
+      TenPhim: '<%= ticket.TenPhim %>',
+      GioChieu: '<%= new Date(ticket.GioChieu).toISOString() %>'
+    });
+
+    new QRCode(document.getElementById("qrcode"), {
+      text: qrData,
+      width: 150,
+      height: 150,
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.H
+    });
+
+    // Auto print on load (optional - comment out if not needed)
+    // window.addEventListener('load', () => {
+    //   setTimeout(() => window.print(), 500);
+    // });
+  </script>
+</body>
+</html>

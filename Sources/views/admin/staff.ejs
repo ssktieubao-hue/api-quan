@@ -1,0 +1,1154 @@
+<%- include('../partials/head') %>
+<%- include('../partials/nav') %>
+
+<div class="section" style="min-height: 80vh;">
+  <div class="container admin-layout">
+    <!-- Premium Sidebar menu -->
+    <div class="premium-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-icon">
+          <i class='bx bx-cog'></i>
+        </div>
+        <h2>Quản trị hệ thống</h2>
+        <p class="sidebar-subtitle">Control Panel</p>
+      </div>
+      <ul class="premium-menu">
+        <% const perms = userPermissions || []; %>
+
+        <% if (user.role === 1 || perms.includes('USER_MANAGE')) { %>
+          <li>
+            <a href="/admin/staff" class="menu-item active">
+              <div class="menu-icon">
+                <i class='bx bx-user-check'></i>
+              </div>
+              <span class="menu-text">Phân quyền nhân viên</span>
+              <div class="menu-indicator"></div>
+            </a>
+          </li>
+        <% } %>
+
+        <% if (user.role === 1 || perms.includes('MOVIE_MANAGE')) { %>
+          <li>
+            <a href="/admin/movies" class="menu-item">
+              <div class="menu-icon">
+                <i class='bx bx-movie'></i>
+              </div>
+              <span class="menu-text">Quản lý phim</span>
+              <div class="menu-indicator"></div>
+            </a>
+          </li>
+        <% } %>
+
+        <% if (user.role === 1 || perms.includes('ROOM_MANAGE')) { %>
+          <li>
+            <a href="/admin/rooms" class="menu-item">
+              <div class="menu-icon">
+                <i class='bx bx-building'></i>
+              </div>
+              <span class="menu-text">Quản lý phòng chiếu</span>
+              <div class="menu-indicator"></div>
+            </a>
+          </li>
+        <% } %>
+
+        <% if (user.role === 1 || perms.includes('SHOWTIME_MANAGE')) { %>
+          <li>
+            <a href="/admin/showtimes" class="menu-item">
+              <div class="menu-icon">
+                <i class='bx bx-calendar-event'></i>
+              </div>
+              <span class="menu-text">Quản lý lịch chiếu</span>
+              <div class="menu-indicator"></div>
+            </a>
+          </li>
+        <% } %>
+
+        <% if (user.role === 1 || perms.includes('SERVICE_MANAGE')) { %>
+          <li>
+            <a href="/admin/services" class="menu-item">
+              <div class="menu-icon">
+                <i class='bx bx-store'></i>
+              </div>
+              <span class="menu-text">Quản lý dịch vụ</span>
+              <div class="menu-indicator"></div>
+            </a>
+          </li>
+        <% } %>
+
+        <% if (user.role === 1 || perms.includes('TICKET_VIEW')) { %>
+          <li>
+            <a href="/admin/tickets" class="menu-item">
+              <div class="menu-icon">
+                <i class='bx bx-ticket'></i>
+              </div>
+              <span class="menu-text">Quản lý vé</span>
+              <div class="menu-indicator"></div>
+            </a>
+          </li>
+        <% } %>
+
+        <% if (user.role === 1 || perms.includes('TMP_TRANSACTION_VIEW')) { %>
+          <li>
+            <a href="/admin/tmp-transactions" class="menu-item">
+              <div class="menu-icon">
+                <i class='bx bx-time-five'></i>
+              </div>
+              <span class="menu-text">Quản lý giao dịch tạm</span>
+              <div class="menu-indicator"></div>
+            </a>
+          </li>
+        <% } %>
+
+        <% if (user.role === 1 || perms.includes('REPORT_VIEW')) { %>
+          <li>
+            <a href="/admin/reports" class="menu-item">
+              <div class="menu-icon">
+                <i class='bx bx-bar-chart-alt-2'></i>
+              </div>
+              <span class="menu-text">Báo cáo doanh thu</span>
+              <div class="menu-indicator"></div>
+            </a>
+          </li>
+        <% } %>
+      </ul>
+    </div>
+
+    <div class="admin-content premium-staff">
+      <!-- Header Section -->
+      <div class="premium-header">
+        <div class="header-content">
+          <h1 class="premium-title">
+            <i class='bx bx-user-check'></i>
+            Phân Quyền Nhân Viên
+          </h1>
+          <p class="premium-subtitle">Quản lý và cấp quyền truy cập cho nhân viên hệ thống</p>
+        </div>
+        <div class="header-stats">
+          <div class="stat-card">
+            <i class='bx bx-group'></i>
+            <div>
+              <span class="stat-number"><%= staffList.length %></span>
+              <span class="stat-label">Nhân viên</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <i class='bx bx-shield-quarter'></i>
+            <div>
+              <span class="stat-number"><%= allPermissions.length %></span>
+              <span class="stat-label">Quyền hạn</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="premium-grid">
+        <!-- Left Column: Staff List & Add Form -->
+        <div class="premium-column">
+          <!-- Staff List Card -->
+          <div class="premium-card">
+            <div class="card-header">
+              <h3><i class='bx bx-list-ul'></i> Danh Sách Nhân Viên</h3>
+              <div class="search-box">
+                <i class='bx bx-search'></i>
+                <input type="text" id="staffSearch" placeholder="Tìm kiếm nhân viên...">
+              </div>
+            </div>
+            
+            <div class="staff-list" id="staffListContainer">
+              <% staffList.forEach((nv, index) => { %>
+                <div class="staff-card <%= selectedId === nv.MaKH ? 'active' : '' %>" 
+                     data-staff-id="<%= nv.MaKH %>"
+                     onclick="selectStaff(<%= nv.MaKH %>)">
+                  <div class="staff-avatar">
+                    <i class='bx bx-user'></i>
+                  </div>
+                  <div class="staff-info">
+                    <h4><%= nv.TenKH %></h4>
+                    <p class="staff-email"><i class='bx bx-envelope'></i> <%= nv.Email || 'Chưa có email' %></p>
+                    <p class="staff-phone"><i class='bx bx-phone'></i> <%= nv.SDT || 'Chưa có SĐT' %></p>
+                    <div class="staff-badge">
+                      <span class="badge badge-staff">Nhân viên</span>
+                      <span class="badge badge-id">ID: <%= nv.MaKH %></span>
+                    </div>
+                  </div>
+                  <div class="staff-actions">
+                    <a href="/admin/staff?staffId=<%= nv.MaKH %>" 
+                       class="action-btn btn-permission" 
+                       onclick="event.stopPropagation()">
+                      <i class='bx bx-key'></i>
+                      <span>Cấp quyền</span>
+                    </a>
+                    <a href="/admin/staff?staffId=<%= nv.MaKH %>#edit-info" 
+                       class="action-btn btn-edit"
+                       onclick="event.stopPropagation()">
+                      <i class='bx bx-edit'></i>
+                    </a>
+                    <form method="POST" 
+                          action="/admin/staff/<%= nv.MaKH %>/delete" 
+                          onsubmit="return confirm('Bạn có chắc muốn xóa nhân viên <%= nv.TenKH %>?');"
+                          onclick="event.stopPropagation()">
+                      <button type="submit" class="action-btn btn-delete">
+                        <i class='bx bx-trash'></i>
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+
+          <!-- Add Staff Card -->
+          <div class="premium-card add-staff-card">
+            <div class="card-header">
+              <h3><i class='bx bx-user-plus'></i> Thêm Nhân Viên Mới</h3>
+            </div>
+            <form method="POST" action="/admin/staff/add" class="premium-form">
+              <div class="form-group">
+                <label><i class='bx bx-user'></i> Họ và tên</label>
+                <input type="text" name="TenKH" placeholder="Nhập họ tên" required>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label><i class='bx bx-phone'></i> Số điện thoại</label>
+                  <input type="text" name="SDT" placeholder="0123456789">
+                </div>
+                <div class="form-group">
+                  <label><i class='bx bx-envelope'></i> Email</label>
+                  <input type="email" name="Email" placeholder="email@example.com" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label><i class='bx bx-user-circle'></i> Tên đăng nhập</label>
+                  <input type="text" name="TenDangNhap" placeholder="username" required>
+                </div>
+                <div class="form-group">
+                  <label><i class='bx bx-lock'></i> Mật khẩu</label>
+                  <input type="password" name="MatKhau" placeholder="••••••••" required>
+                </div>
+              </div>
+              <button type="submit" class="btn-premium btn-primary">
+                <i class='bx bx-plus'></i>
+                Tạo Nhân Viên
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Right Column: Permissions -->
+        <div class="premium-column">
+          <div class="premium-card permissions-card">
+            <div class="card-header">
+              <h3><i class='bx bx-shield-quarter'></i> Quản Lý Quyền Hạn</h3>
+              <% if (selectedId) { %>
+                <% const nvSelected = staffList.find(nv => nv.MaKH === selectedId); %>
+                <div class="selected-staff-info">
+                  <div class="selected-avatar">
+                    <i class='bx bx-user'></i>
+                  </div>
+                  <div>
+                    <strong><%= nvSelected.TenKH %></strong>
+                    <p><%= nvSelected.Email %></p>
+                  </div>
+                </div>
+              <% } %>
+            </div>
+
+            <% if (!selectedId) { %>
+              <div class="empty-state">
+                <i class='bx bx-info-circle'></i>
+                <h4>Chưa chọn nhân viên</h4>
+                <p>Vui lòng chọn một nhân viên từ danh sách bên trái để bắt đầu cấp quyền.</p>
+              </div>
+            <% } else { %>
+              <form method="POST" action="/admin/staff/<%= selectedId %>/permissions" class="permissions-form">
+                <div class="permissions-list">
+                  <% allPermissions.forEach(q => { 
+                       const isGranted = selectedPermissions.includes(q.MaQuyen);
+                  %>
+                    <div class="permission-item <%= isGranted ? 'granted' : '' %>">
+                      <div class="permission-info">
+                        <div class="permission-icon">
+                          <i class='bx bx-<%= isGranted ? 'check-circle' : 'circle' %>'></i>
+                        </div>
+                        <div class="permission-details">
+                          <h4><%= q.TenQuyen %></h4>
+                          <p class="permission-code"><%= q.MaCode %></p>
+                        </div>
+                      </div>
+                      <label class="toggle-switch">
+                        <input type="checkbox" 
+                               name="permissions" 
+                               value="<%= q.MaQuyen %>" 
+                               <%= isGranted ? 'checked' : '' %>
+                               onchange="updatePermissionStatus(this)">
+                        <span class="slider"></span>
+                      </label>
+                    </div>
+                  <% }) %>
+                </div>
+                
+                <div class="form-actions">
+                  <button type="submit" class="btn-premium btn-success">
+                    <i class='bx bx-check'></i>
+                    Xác Nhận Quyền
+                  </button>
+                  <a href="/admin/staff" class="btn-premium btn-secondary">
+                    <i class='bx bx-x'></i>
+                    Hủy
+                  </a>
+                </div>
+              </form>
+
+              <!-- Edit Staff Info -->
+              <% const nvSelected = staffList.find(nv => nv.MaKH === selectedId); %>
+              <% if (nvSelected) { %>
+                <div class="premium-card edit-staff-card" id="edit-info">
+                  <div class="card-header">
+                    <h3><i class='bx bx-edit-alt'></i> Cập Nhật Thông Tin</h3>
+                  </div>
+                  <form method="POST" action="/admin/staff/<%= nvSelected.MaKH %>/update" class="premium-form">
+                    <div class="form-group">
+                      <label><i class='bx bx-user'></i> Họ tên</label>
+                      <div class="current-value">Hiện tại: <strong><%= nvSelected.TenKH %></strong></div>
+                      <input type="text" name="TenKH" placeholder="Để trống nếu giữ nguyên">
+                    </div>
+                    <div class="form-group">
+                      <label><i class='bx bx-phone'></i> Số điện thoại</label>
+                      <div class="current-value">Hiện tại: <strong><%= nvSelected.SDT || 'Chưa có' %></strong></div>
+                      <input type="text" name="SDT" placeholder="Để trống nếu giữ nguyên">
+                    </div>
+                    <div class="form-group">
+                      <label><i class='bx bx-envelope'></i> Email</label>
+                      <div class="current-value">Hiện tại: <strong><%= nvSelected.Email || 'Chưa có' %></strong></div>
+                      <input type="email" name="Email" placeholder="Để trống nếu giữ nguyên">
+                    </div>
+                    <div class="form-actions">
+                      <button type="submit" class="btn-premium btn-primary">
+                        <i class='bx bx-save'></i>
+                        Lưu Thay Đổi
+                      </button>
+                      <a href="/admin/staff?staffId=<%= nvSelected.MaKH %>" class="btn-premium btn-secondary">
+                        <i class='bx bx-x'></i>
+                        Hủy
+                      </a>
+                    </div>
+                  </form>
+                </div>
+              <% } %>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer', { footerMenus: [] }) %>
+<%- include('../partials/scripts') %>
+
+<style>
+  .premium-staff {
+    padding: 2rem 0;
+  }
+
+  /* Header */
+  .premium-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    color: white;
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+  }
+
+  .header-content {
+    margin-bottom: 1.5rem;
+  }
+
+  .premium-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .premium-title i {
+    font-size: 2.5rem;
+  }
+
+  .premium-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+  }
+
+  .header-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .stat-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.3s;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .stat-card i {
+    font-size: 2.5rem;
+    opacity: 0.9;
+  }
+
+  .stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  .stat-label {
+    display: block;
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+
+  /* Grid Layout */
+  .premium-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 2rem;
+  }
+
+  @media (max-width: 1200px) {
+    .premium-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Premium Card */
+  .premium-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+  }
+
+  .premium-card:hover {
+    border-color: rgba(102, 126, 234, 0.5);
+    box-shadow: 0 12px 48px rgba(102, 126, 234, 0.2);
+  }
+
+  .card-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .card-header h3 {
+    font-size: 1.5rem;
+    color: var(--main-color);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .card-header h3 i {
+    font-size: 1.5rem;
+  }
+
+  /* Search Box */
+  .search-box {
+    position: relative;
+    margin-top: 1rem;
+  }
+
+  .search-box i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .search-box input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 3rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    color: white;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+  }
+
+  .search-box input:focus {
+    outline: none;
+    border-color: var(--main-color);
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .search-box input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* Staff List */
+  .staff-list {
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+  }
+
+  .staff-list::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .staff-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+  }
+
+  .staff-list::-webkit-scrollbar-thumb {
+    background: var(--main-color);
+    border-radius: 10px;
+  }
+
+  .staff-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .staff-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--main-color);
+    transform: translateX(4px);
+  }
+
+  .staff-card.active {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+    border-color: var(--main-color);
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  }
+
+  .staff-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .staff-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .staff-info h4 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: white;
+  }
+
+  .staff-email,
+  .staff-phone {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .staff-badge {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .badge-staff {
+    background: rgba(102, 126, 234, 0.3);
+    color: #a5b4fc;
+  }
+
+  .badge-id {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .staff-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .action-btn {
+    padding: 0.75rem;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    text-decoration: none;
+    color: white;
+    font-size: 0.9rem;
+  }
+
+  .btn-permission {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    gap: 0.5rem;
+  }
+
+  .btn-permission:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  }
+
+  .btn-edit {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+  }
+
+  .btn-edit:hover {
+    background: rgba(255, 193, 7, 0.3);
+  }
+
+  .btn-delete {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+  }
+
+  .btn-delete:hover {
+    background: rgba(244, 67, 54, 0.3);
+  }
+
+  /* Form Styles */
+  .premium-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .form-group input {
+    padding: 0.875rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    color: white;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+  }
+
+  .form-group input:focus {
+    outline: none;
+    border-color: var(--main-color);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  .form-group input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .current-value {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 0.25rem;
+  }
+
+  /* Buttons */
+  .btn-premium {
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    transition: all 0.3s;
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+    color: white;
+  }
+
+  .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(67, 160, 71, 0.4);
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  /* Permissions */
+  .selected-staff-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 10px;
+    margin-top: 1rem;
+  }
+
+  .selected-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  .empty-state h4 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .permissions-list {
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .permissions-list::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .permissions-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+  }
+
+  .permissions-list::-webkit-scrollbar-thumb {
+    background: var(--main-color);
+    border-radius: 10px;
+  }
+
+  .permission-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.3s;
+  }
+
+  .permission-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(102, 126, 234, 0.5);
+  }
+
+  .permission-item.granted {
+    background: rgba(67, 160, 71, 0.1);
+    border-color: rgba(67, 160, 71, 0.3);
+  }
+
+  .permission-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+  }
+
+  .permission-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(102, 126, 234, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--main-color);
+  }
+
+  .permission-item.granted .permission-icon {
+    background: rgba(67, 160, 71, 0.2);
+    color: #43a047;
+  }
+
+  .permission-details h4 {
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+    color: white;
+  }
+
+  .permission-code {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-family: 'Courier New', monospace;
+  }
+
+  /* Toggle Switch */
+  .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+  }
+
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.2);
+    transition: 0.4s;
+    border-radius: 30px;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+  }
+
+  input:checked + .slider {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  input:checked + .slider:before {
+    transform: translateX(30px);
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .form-actions .btn-premium {
+    flex: 1;
+  }
+
+  /* Edit Staff Card */
+  .edit-staff-card {
+    margin-top: 2rem;
+  }
+
+  /* Premium Sidebar */
+  .premium-sidebar {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+    position: sticky;
+    top: 2rem;
+  }
+
+  .sidebar-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .sidebar-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 1rem;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  }
+
+  .premium-sidebar h2 {
+    font-size: 1.5rem;
+    color: white;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+  }
+
+  .sidebar-subtitle {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 600;
+  }
+
+  .premium-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .premium-menu li {
+    margin: 0;
+  }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid transparent;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .menu-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transform: scaleY(0);
+    transition: transform 0.3s;
+  }
+
+  .menu-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(102, 126, 234, 0.3);
+    transform: translateX(4px);
+    color: white;
+  }
+
+  .menu-item:hover::before {
+    transform: scaleY(1);
+  }
+
+  .menu-item.active {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+    border-color: rgba(102, 126, 234, 0.5);
+    color: white;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+  }
+
+  .menu-item.active::before {
+    transform: scaleY(1);
+  }
+
+  .menu-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(102, 126, 234, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: var(--main-color);
+    transition: all 0.3s;
+    flex-shrink: 0;
+  }
+
+  .menu-item:hover .menu-icon,
+  .menu-item.active .menu-icon {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transform: scale(1.1);
+  }
+
+  .menu-text {
+    flex: 1;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.3s;
+  }
+
+  .menu-item.active .menu-text {
+    font-weight: 600;
+  }
+
+  .menu-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    opacity: 0;
+    transition: all 0.3s;
+  }
+
+  .menu-item.active .menu-indicator {
+    opacity: 1;
+    background: var(--main-color);
+    box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+  }
+
+  /* Admin Layout */
+  .admin-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2rem;
+  }
+
+  @media (max-width: 1200px) {
+    .admin-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .premium-sidebar {
+      position: relative;
+      top: 0;
+    }
+  }
+</style>
+
+<script>
+  function selectStaff(staffId) {
+    window.location.href = `/admin/staff?staffId=${staffId}`;
+  }
+
+  function updatePermissionStatus(checkbox) {
+    const item = checkbox.closest('.permission-item');
+    if (checkbox.checked) {
+      item.classList.add('granted');
+    } else {
+      item.classList.remove('granted');
+    }
+  }
+
+  // Search functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('staffSearch');
+    if (searchInput) {
+      searchInput.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const staffCards = document.querySelectorAll('.staff-card');
+        
+        staffCards.forEach(card => {
+          const name = card.querySelector('h4').textContent.toLowerCase();
+          const email = card.querySelector('.staff-email').textContent.toLowerCase();
+          const phone = card.querySelector('.staff-phone').textContent.toLowerCase();
+          
+          if (name.includes(searchTerm) || email.includes(searchTerm) || phone.includes(searchTerm)) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    }
+  });
+</script>

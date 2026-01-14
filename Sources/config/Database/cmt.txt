@@ -1,0 +1,10 @@
+    Migration để tạo bảng
+
+    Seed để tạo dữ liệu mẫu
+
+# Cấu hình DB, biến môi trường
+Cấu hình cơ sở dữ liệu
+
+Cấu hình server
+
+Cấu hình JWT

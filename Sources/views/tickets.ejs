@@ -1,0 +1,153 @@
+<%- include('partials/head') %>
+<link rel="stylesheet" href="/css/tickets.css" />
+
+<%- include('partials/nav') %>
+
+<div class="section" style="min-height: 80vh; padding-top: 2rem;">
+    <div class="container">
+        <h1 style="color: var(--main-color); margin-bottom: 2rem; text-align: center;">Vé Của Tôi</h1>
+        <!-- VÉ CHỜ THANH TOÁN -->
+        <% if (pendingTickets && pendingTickets.length > 0) { %>
+            <h2 class="section-title">🎟 Vé Chờ Thanh Toán</h2>
+          
+            <% pendingTickets.forEach(p => { %>
+              <div class="ticket-card pending">
+                <div class="ticket-left">
+                  <img src="<%= p.Anh || '/images/movies/default.jpg' %>" class="ticket-poster">
+                </div>
+          
+                <div class="ticket-center">
+                  <h3><%= p.TenPhim %></h3>
+          
+                  <p><i class="bx bx-chair"></i> Ghế:
+                    <strong><%= p.GheNgoi %></strong>
+                  </p>
+          
+                  <p><i class="bx bx-time"></i> Giờ chiếu:
+                    <%= new Date(p.GioChieu).toLocaleString('vi-VN',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'}) %>
+                  </p>
+          
+                  <p><i class="bx bx-building-house"></i> Phòng:
+                    <strong><%= p.TenPhong %></strong>
+                  </p>
+          
+                  <p><i class="bx bx-purchase-tag-alt"></i> Mã Seri:
+                    <strong>#<%= p.MaGD %></strong>
+                  </p>
+                  
+                  <% if (p.DichVu && p.DichVu.length > 0) { %>
+                    <p style="margin-top:0.5rem; color:#ffce00;">
+                      🍿 Đã chọn:
+                      <% p.DichVu.forEach(d => { %>
+                        <span><%= d.TenDV %> x <%= d.SoLuong %></span>
+                      <% }) %>
+                    </p>
+                  <% } %>
+                  
+                  <p class="expire">
+                    ⏳ Hết hạn giữ: <span><%= new Date(p.HetHan).toLocaleTimeString('vi-VN') %></span>
+                  </p>
+                </div>
+          
+                <div class="ticket-right">
+                    <button class="ticket-btn ticket-pay" onclick="payAgain('<%= p.MaGD %>')">
+                        THANH TOÁN
+                      </button>
+                      
+                      <button class="ticket-btn ticket-cancel" onclick="cancelHold('<%= p.MaGD %>')">
+                        HỦY
+                      </button>
+                      
+                </div>
+              </div>
+            <% }); %>
+          <% } %>
+          
+
+        <% if (typeof tickets !== 'undefined' && tickets.length > 0) { %>
+            <div id="successMessage" style="background: rgba(0, 255, 0, 0.2); color: #51cf66; padding: 1rem; border-radius: 5px; margin-bottom: 2rem; border-left: 4px solid #51cf66; text-align: center; display: none;">
+                Đặt vé thành công!
+            </div>
+            
+            <div style="display: grid; gap: 1.5rem;">
+                <% tickets.forEach(ticket => { %>
+                    <div style="background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); display: grid; grid-template-columns: 150px 1fr auto; gap: 2rem; align-items: center;">
+                        <div>
+                            <img src="<%= ticket.Anh || '/images/movies/default.jpg' %>" 
+                                 alt="<%= ticket.TenPhim %>" 
+                                 style="width: 100%; border-radius: 10px;">
+                        </div>
+                        <div style="color: #fff;">
+                            <h2 style="color: var(--main-color); margin-bottom: 1rem;"><%= ticket.TenPhim %></h2>
+                            <p style="margin-bottom: 0.5rem;">
+                                <i class="bx bx-calendar"></i> 
+                                <%= new Date(ticket.GioChieu).toLocaleString('vi-VN', { 
+                                    weekday: 'long',
+                                    day: '2-digit', 
+                                    month: '2-digit', 
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                }) %>
+                            </p>
+                            <p style="margin-bottom: 0.5rem;">
+                                <i class="bx bx-building"></i> Phòng: <%= ticket.TenPhong %>
+                            </p>
+                            <p style="margin-bottom: 0.5rem;">
+                                <i class="bx bx-chair"></i> Ghế: <strong style="color: var(--main-color);"><%= ticket.GheNgoi %></strong>
+                            </p>
+                            <p style="margin-bottom: 0.5rem;">
+                                <i class="bx bx-money"></i> Giá vé: 
+                                <strong style="color: var(--main-color);">
+                                    <%= Number(ticket.GiaVe).toLocaleString('vi-VN') %> VNĐ
+                                </strong>
+                            </p>
+                            
+                            <% if (ticket.DichVu && ticket.DichVu.length > 0) { %>
+                              <p style="margin-top:0.5rem; font-weight:600; color:#ffda45">
+                                🍿 Combo đã mua:
+                              </p>
+                              <ul style="margin-left:1rem; font-size:0.9rem; opacity:0.9;">
+                                <% ticket.DichVu.forEach(dv => { %>
+                                  <li>
+                                    <%= dv.TenDV %> x <%= dv.SoLuong %> 
+                                    – <%= Number(dv.Gia * dv.SoLuong).toLocaleString('vi-VN') %> VNĐ
+                                  </li>
+                                <% }) %>
+                              </ul>
+                            <% } %>
+                            
+                            <p style="margin-bottom: 0.5rem; color: rgba(255,255,255,0.6); font-size: 0.9rem;">
+                                Mã vé: #<%= ticket.MaVe %> | 
+                                Ngày mua: <%= new Date(ticket.NgayMua).toLocaleString('vi-VN') %>
+                            </p>
+                        </div>
+                        <div>
+                            <button onclick="printTicket('<%= ticket.MaVe %>')" 
+                                    class="btn btn-hover"
+                                    style="padding: 0.75rem 1.5rem; margin-bottom: 0.5rem; width: 100%;">
+                                <i class="bx bx-printer"></i> In Vé
+                            </button>
+                            <button class="ticket-btn ticket-cancel" onclick="deleteTicket('<%= ticket.MaVe %>')">
+                                HỦY VÉ
+                              </button>                              
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } else { %>
+            <div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.7);">
+                <i class="bx bx-ticket" style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                <p style="font-size: 1.2rem; margin-bottom: 1rem;">Bạn chưa có vé nào</p>
+                <a href="/" class="btn btn-hover" style="display: inline-block;">
+                    <span>Đặt Vé Ngay</span>
+                </a>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<script src="/js/tickets.js"></script>
+
+<%- include('partials/footer', { footerMenus: [] }) %>
+<%- include('partials/scripts') %>

@@ -1,0 +1,302 @@
+<%- include('partials/head') %>
+
+<%- include('partials/nav') %>
+
+<div id="intro-video">
+    <video autoplay playsinline muted id="intro-vid">
+        <source src="/videos/cas4.mp4" type="video/mp4">
+    </video>
+</div>
+
+<!-- HERO SECTION -->
+<div class="hero-section">
+    <!-- HERO SLIDE -->
+    <div class="hero-slide">
+        <div class="owl-carousel carousel-nav-center" id="hero-carousel">
+            <% 
+            // Dữ liệu hero slides - chỉ hiển thị phim có MaPhim từ database
+            const heroSlides = (typeof heroFilms !== 'undefined' && Array.isArray(heroFilms) && heroFilms.length > 0)
+                ? heroFilms.filter(film => film && film.MaPhim)
+                : [];
+            if (heroSlides.length > 0) {
+                heroSlides.forEach((film, index) => { %>
+                    <%- include('partials/hero-slide-item', { film }) %>
+                <% });
+            } else { %>
+                <!-- Nếu không có dữ liệu hero, hiển thị một slide mặc định với message -->
+                <div class="hero-slide-item">
+                    <img src="/images/black-banner.png" alt="Chưa có phim">
+                    <div class="overlay"></div>
+                    <div class="hero-slide-item-content">
+                        <div class="item-content-wraper">
+                            <div class="item-content-title top-down">
+                                Chào mừng đến với GAMYW
+                            </div>
+                            <div class="item-content-description top-down delay-4">
+                                Hệ thống đang được cập nhật. Vui lòng quay lại sau.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+    <!-- END HERO SLIDE -->
+    
+    <!-- TOP MOVIES SLIDE -->
+    <div class="top-movies-slide">
+        <div class="owl-carousel" id="top-movies-slide">
+            <% 
+            const topMovies = (typeof topMoviesFilms !== 'undefined' && Array.isArray(topMoviesFilms) && topMoviesFilms.length > 0)
+                ? topMoviesFilms.filter(film => film && film.MaPhim) // Chỉ hiển thị phim có MaPhim
+                : [];
+            topMovies.forEach((film) => { %>
+                <%- include('partials/movie-item', { film, isLink: true }) %>
+            <% }); %>
+        </div>
+    </div>
+    <!-- END TOP MOVIES SLIDE -->
+</div>
+<!-- END HERO SECTION -->
+
+<!-- LATEST MOVIES SECTION -->
+<div class="section">
+    <div class="container">
+        <div class="section-header">
+            latest movies
+        </div>
+        <div class="movies-slide carousel-nav-center owl-carousel">
+            <% 
+            const latestMovies = (typeof moviesFilms !== 'undefined' && Array.isArray(moviesFilms) && moviesFilms.length > 0)
+                ? moviesFilms.filter(film => film && film.MaPhim) // Chỉ hiển thị phim có MaPhim
+                : [];
+            latestMovies.forEach((film) => { %>
+                <%- include('partials/movie-item', { film, isLink: true }) %>
+            <% }); %>
+            <% if (latestMovies.length === 0) { %>
+                <p style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem; grid-column: 1/-1;">
+                    Chưa có phim nào trong danh mục này. Vui lòng thêm phim vào database với cột Loai = 'MOVIE'
+                </p>
+            <% } %>
+        </div>
+    </div>
+</div>
+<!-- END LATEST MOVIES SECTION -->
+
+<!-- LATEST SERIES SECTION -->
+<div class="section">
+    <div class="container">
+        <div class="section-header">
+            latest series
+        </div>
+        <div class="movies-slide carousel-nav-center owl-carousel">
+            <% 
+            const latestSeries = (typeof seriesFilms !== 'undefined' && Array.isArray(seriesFilms) && seriesFilms.length > 0)
+                ? seriesFilms.filter(film => film && film.MaPhim) // Chỉ hiển thị phim có MaPhim
+                : [];
+            latestSeries.forEach((film) => { %>
+                <%- include('partials/movie-item', { film, isLink: true }) %>
+            <% }); %>
+            <% if (latestSeries.length === 0) { %>
+                <p style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem; grid-column: 1/-1;">
+                    Chưa có series nào trong danh mục này. Vui lòng thêm phim vào database với cột Loai = 'SERIES'
+                </p>
+            <% } %>
+        </div>
+    </div>
+</div>
+<!-- END LATEST SERIES SECTION -->
+
+<!-- LATEST CARTOONS SECTION -->
+<div class="section">
+    <div class="container">
+        <div class="section-header">
+            latest cartoons
+        </div>
+        <div class="movies-slide carousel-nav-center owl-carousel">
+            <% 
+            const latestCartoons = (typeof cartoonsFilms !== 'undefined' && Array.isArray(cartoonsFilms) && cartoonsFilms.length > 0)
+                ? cartoonsFilms.filter(film => film && film.MaPhim) // Chỉ hiển thị phim có MaPhim
+                : [];
+            latestCartoons.forEach((film) => { %>
+                <%- include('partials/movie-item', { film, isLink: true }) %>
+            <% }); %>
+            <% if (latestCartoons.length === 0) { %>
+                <p style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem; grid-column: 1/-1;">
+                    Chưa có phim hoạt hình nào trong danh mục này. Vui lòng thêm phim vào database với cột Loai = 'CARTOON'
+                </p>
+            <% } %>
+        </div>
+    </div>
+</div>
+<!-- END LATEST CARTOONS SECTION -->
+
+<!-- SPECIAL MOVIE SECTION -->
+<div class="section">
+    <div class="hero-slide-item">
+        <img src="/images/transformer-banner.jpg" alt="Transformers">
+        <div class="overlay"></div>
+        <div class="hero-slide-item-content">
+            <div class="item-content-wraper">
+                <div class="item-content-title">
+                    Transformers
+                </div>
+                <div class="movie-infos">
+                    <div class="movie-info">
+                        <i class="bx bxs-star"></i>
+                        <span>9.5</span>
+                    </div>
+                    <div class="movie-info">
+                        <i class="bx bxs-time"></i>
+                        <span>120 mins</span>
+                    </div>
+                    <div class="movie-info">
+                        <span>HD</span>
+                    </div>
+                    <div class="movie-info">
+                        <span>16+</span>
+                    </div>
+                </div>
+                <div class="item-content-description">
+                    Cách đây chừng 4 triệu năm, trên hành tinh Cybertron xa xôi tồn tại một nền văn minh của robot. nhưng rồi nền văn minh ấy bị tàn phá bởi cuộc chiến kéo dài nhiều thế kỷ giữa hai chủng người máy: autobot (phe thiện) và deception (phe ác). Chúng đánh nhau để tranh giành allspark (thực thể lập phương) – thứ có khả năng mang tới quyền lực tối thượng cho kẻ sở hữu nó. Và rồi Trái Đất vô tình bị cuốn vào cuộc chiến khốc liệt này với những vũ khí mang tính hủy diệt khủng khiếp mà hai chủng tộc đó có khả năng biến hình đa dạng từ những chiếc xe tự hành cho đến những chiếc máy bay, những cỗ máy chiến đấu hủy diệt hàng loạt...
+                </div>
+                <div class="item-action">
+                    <a href="http://localhost:3000/film/11" class="btn btn-hover">
+                        <i class="bx bxs-right-arrow"></i>
+                        <span>Đặt vé ngay!</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END SPECIAL MOVIE SECTION -->
+
+<!-- PRICING SECTION -->
+<div class="section">
+    <div class="container">
+        <div class="pricing">
+            <div class="pricing-header">
+                GA<span class="main-color">M</span>Y<span class="main-color">W</span> pricing
+            </div>
+            <div class="pricing-list">
+                <div class="row">
+                    <% 
+                    const pricingPlans = [
+                        { 
+                            name: 'Basic', 
+                            price: 'Free', 
+                            period: null, 
+                            highlight: false,
+                            features: [
+                                { text: 'Originals', del: false },
+                                { text: 'Swich plans anytime', del: false },
+                                { text: '65+ top Live', del: true },
+                                { text: 'TV Channels', del: true },
+                                { text: '4K Video Quality', del: true }
+                            ]
+                        },
+                        { 
+                            name: 'Premium', 
+                            price: '$15.99', 
+                            period: 'month', 
+                            highlight: true,
+                            features: [
+                                { text: 'Originals', del: false },
+                                { text: 'Swich plans anytime', del: false },
+                                { text: 'Full HD Video Quality', del: false },
+                                { text: '65+ top Live', del: false },
+                                { text: 'TV Channels', del: true }
+                            ]
+                        },
+                        { 
+                            name: 'VIP', 
+                            price: '$35.99', 
+                            period: 'month', 
+                            highlight: false,
+                            features: [
+                                { text: 'Originals', del: false },
+                                { text: 'Swich plans anytime', del: false },
+                                { text: '65+ top Live', del: false },
+                                { text: 'TV Channels', del: false },
+                                { text: '4K Video Quality', del: false }
+                            ]
+                        }
+                    ];
+                    pricingPlans.forEach((plan) => { %>
+                        <%- include('partials/pricing-box', { plan }) %>
+                    <% }); %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END PRICING SECTION -->
+
+<% 
+const footerMenus = [
+    {
+        title: 'GAMYW',
+        items: [
+            { type: 'link', text: 'About us', href: '#' },
+            { type: 'link', text: 'My profile', href: '#' },
+            { type: 'link', text: 'Pricing plans', href: '#' },
+            { type: 'link', text: 'Contacts', href: '#' }
+        ]
+    },
+    {
+        title: 'Browse',
+        items: [
+            { type: 'link', text: 'About us', href: '#' },
+            { type: 'link', text: 'My profile', href: '#' },
+            { type: 'link', text: 'Pricing plans', href: '#' },
+            { type: 'link', text: 'Contacts', href: '#' }
+        ]
+    },
+    {
+        title: 'Help',
+        items: [
+            { type: 'link', text: 'About us', href: '#' },
+            { type: 'link', text: 'My profile', href: '#' },
+            { type: 'link', text: 'Pricing plans', href: '#' },
+            { type: 'link', text: 'Contacts', href: '#' }
+        ]
+    },
+    {
+        title: 'Download app',
+        items: [
+            { type: 'image', src: '/images/google-play.png', alt: 'Google Play', href: '#' },
+            { type: 'image', src: '/images/app-store.png', alt: 'App Store', href: '#' }
+        ]
+    }
+];
+%>
+<%- include('partials/footer', { footerMenus }) %>
+
+<!-- Trailer Modal -->
+<div id="trailer-modal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9);">
+    <div style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+        <video id="trailer-video" controls style="max-width: 90%; max-height: 90%;"></video>
+        <button onclick="closeTrailerModal()" style="position: absolute; top: 20px; right: 20px; background: #ff0000; color: white; border: none; padding: 10px; cursor: pointer; font-size: 18px;">&times;</button>
+    </div>
+</div>
+
+<script>
+function openTrailerModal(videoSrc) {
+    const modal = document.getElementById('trailer-modal');
+    const video = document.getElementById('trailer-video');
+    video.src = videoSrc;
+    modal.style.display = 'block';
+    video.play();
+}
+
+function closeTrailerModal() {
+    const modal = document.getElementById('trailer-modal');
+    const video = document.getElementById('trailer-video');
+    modal.style.display = 'none';
+    video.pause();
+    video.src = '';
+}
+</script>
+
+<%- include('partials/scripts') %>

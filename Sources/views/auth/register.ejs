@@ -1,0 +1,147 @@
+<%- include('../partials/head') %>
+
+<link rel="stylesheet" href="/css/register-plan.css">
+
+<%- include('../partials/nav') %>
+<div class="pricing-section">
+    <div class="container">
+        <div class="pricing-title">
+            <h1>GAMYW LẬU XUYÊN QUỐC GIA</h1>
+            <p>Chọn gói phù hợp với bạn</p>
+        </div>
+
+        <div class="plan-grid">
+            <% 
+            const pricingPlans = [
+                { 
+                    name: 'Dân Đen', 
+                    price: 'Free', 
+                    period: '', 
+                    highlight: false,
+                    features: [
+                        { text: 'Originals', del: false },
+                        { text: 'Switch plans anytime', del: false },
+                        { text: '65+ sale 20% price', del: false },
+                        { text: 'plus cinema theater', del: false },
+                        { text: 'HD Video Quality', del: false }
+                    ]
+                },
+                { 
+                    name: 'Quýs Tộc',
+                    price: '$149.99', 
+                    period: '/month', 
+                    highlight: true,
+                    features: [
+                        { text: 'Originals', del: false },
+                        { text: 'Switch plans anytime', del: false },
+                        { text: 'Full HD Video Quality', del: false },
+                        { text: 'noble room', del: false },
+                        { text: 'noble services', del: false }
+                    ]
+                },
+                { 
+                    name: 'Vua', 
+                    price: '$1000000', 
+                    period: '/month', 
+                    highlight: false,
+                    features: [
+                        { text: 'Originals', del: false },
+                        { text: 'choose plans anytime', del: false },
+                        { text: '999+ power', del: false },
+                        { text: 'King room', del: false },
+                        { text: 'King services', del: false }
+                    ]
+                }
+            ];
+            
+            pricingPlans.forEach((plan) => { %>
+                <div class="plan-card <%= plan.highlight ? 'highlight' : '' %>">
+                    
+                    <% if (plan.highlight) { %>
+                        <div class="plan-badge">PHỔ BIẾN NHẤT</div>
+                    <% } %>
+
+                    <div class="plan-header">
+                        <h2><%= plan.name %></h2>
+                        <div class="plan-price">
+                            <span><%= plan.price %></span>
+                            <% if (plan.period) { %>
+                                <span><%= plan.period %></span>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <div>
+                        <% plan.features.forEach((feature) => { %>
+                            <div class="plan-feature <%= feature.del ? 'del' : '' %>">
+                                <% if (feature.del) { %>
+                                    <i class="bx bx-x"></i>
+                                <% } else { %>
+                                    <i class="bx bx-check"></i>
+                                <% } %>
+                                <span><%= feature.text %></span>
+                            </div>
+                        <% }); %>
+                    </div>
+
+                    <button 
+                        type="button" 
+                        class="btn btn-hover plan-select-btn <%= plan.highlight ? 'highlight' : '' %>"
+                        data-plan="<%= plan.name.toLowerCase() %>">
+                        <span>ĐĂNG KÝ NGAY</span>
+                    </button>
+                </div>
+            <% }); %>
+        </div>
+
+        <!-- Registration Form Modal -->
+        <div id="registerModal">
+            <div class="modal-box">
+                <button onclick="closeModal()" class="close-btn">
+                    <i class="bx bx-x"></i>
+                </button>
+                
+                <h2 class="modal-title">
+                    Đăng Ký Gói <span id="planName"></span>
+                </h2>
+                
+                <% if (typeof error !== 'undefined' && error) { %>
+                    <div class="error-box"><%= error %></div>
+                <% } %>
+
+                <form method="POST" action="/register-plan" id="planRegisterForm">
+                    <input type="hidden" name="plan" id="selectedPlan" value="">
+                    
+                    <label>Họ và tên</label>
+                    <input type="text" name="TenKH" class="modal-input" required placeholder="Nhập họ và tên">
+
+                    <label>Email</label>
+                    <input type="email" name="Email" class="modal-input" required placeholder="Nhập email của bạn">
+
+                    <label>Tên đăng nhập</label>
+                    <input type="text" name="TenDangNhap" class="modal-input" required placeholder="Nhập tên đăng nhập">
+
+                    <label>Mật khẩu</label>
+                    <input type="password" name="MatKhau" minlength="6" class="modal-input" required placeholder="Nhập mật khẩu (ít nhất 6 ký tự)">
+
+                    <label>Xác nhận mật khẩu</label>
+                    <input type="password" name="MatKhauXacNhan" minlength="6" class="modal-input" required placeholder="Nhập lại mật khẩu">
+
+                    <button type="submit" class="btn btn-hover" style="width: 100%; padding: 1rem; font-size: 1.1rem; font-weight: bold;">
+                        <span>Đăng Ký</span>
+                    </button>
+
+                    <div class="modal-login-ref">
+                        Đã có tài khoản? 
+                        <a href="/login">Đăng nhập</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/register-plan.js"></script>
+
+<%- include('../partials/footer', { footerMenus: [] }) %>
+<%- include('../partials/scripts') %>
