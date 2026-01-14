@@ -87,6 +87,10 @@ export const ve_Controller = {
       // Kiểm tra quyền: customer chỉ xóa được vé của mình
       if (req.user && req.user.role === 3) {
         const ve = await ve_Services.getById_Service(MaVe)
+        if (!ve) {
+          return res.status(404).json({ message: 'Không tìm thấy vé' })
+        }
+        
         const userId = req.user.MaKH || req.user.id;
         if (ve.MaKH !== userId) {
           return res.status(403).json({ message: 'Không có quyền xóa vé này' })
@@ -96,6 +100,10 @@ export const ve_Controller = {
       await ve_Services.delete_Service(MaVe)
       res.status(200).json({ message: 'Xóa vé thành công' })
     } catch (error) {
+      logger.error('Lỗi xóa vé:', error)
+      if (error.statusCode) {
+        return res.status(error.statusCode).json({ message: error.message })
+      }
       next(error)
     }
   },

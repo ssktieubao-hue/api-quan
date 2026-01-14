@@ -53,9 +53,20 @@ export const ve_Services = {
 
   delete_Service: async (MaVe) => {
     try {
+      // Kiểm tra vé có tồn tại không và trạng thái
+      const ve = await ve_Repo.getById_Repo(MaVe)
+      if (!ve) {
+        throw new ApiError('Không tìm thấy vé', 404)
+      }
+      
+      // Chỉ cho phép hủy vé ở trạng thái ACTIVE
+      if (ve.TrangThai !== 'ACTIVE') {
+        throw new ApiError('Chỉ có thể hủy vé ở trạng thái ACTIVE', 400)
+      }
+      
       const affectedRows = await ve_Repo.delete_Repo(MaVe)
       if (affectedRows === 0) {
-        throw new ApiError('Không tìm thấy vé', 404)
+        throw new ApiError('Không thể xóa vé', 500)
       }
       logger.info(`Dịch vụ: Xóa vé với MaVe: ${MaVe}`)
       return affectedRows

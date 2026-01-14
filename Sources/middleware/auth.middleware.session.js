@@ -6,7 +6,9 @@ export function authenticate(req, res, next) {
   if (req.session && req.session.user) {
     req.user = {
       id: req.session.user.id,
+      MaKH: req.session.user.MaKH || req.session.user.id,
       role: req.session.user.role,
+      ...req.session.user, // Truyền tất cả thông tin từ session
     }
     return next()
   }

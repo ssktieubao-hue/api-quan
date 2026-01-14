@@ -24,6 +24,9 @@ async function deleteTicket(maVe) {
     const response = await fetch(`/api/ve/${maVe}`, {
       method: 'DELETE',
       credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     })
 
     const result = await response.json()
@@ -33,6 +36,7 @@ async function deleteTicket(maVe) {
       location.reload()
     } else {
       alert(result.message || 'Hủy vé thất bại')
+      console.error('Delete ticket error:', result)
     }
   } catch (error) {
     console.error('Error:', error)
@@ -80,6 +84,27 @@ async function payAgain(orderId) {
 
 async function cancelHold(orderId) {
   if (!confirm('Bạn có chắc muốn hủy ghế?')) return
-  const res = await fetch(`/api/payment/cancel/${orderId}`, { method:'POST' })
-  location.reload()
+  
+  try {
+    const response = await fetch(`/api/payment/cancel/${orderId}`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    const result = await response.json()
+
+    if (response.ok && result.success) {
+      alert('Hủy ghế thành công')
+      location.reload()
+    } else {
+      alert(result.message || 'Hủy ghế thất bại')
+      console.error('Cancel hold error:', result)
+    }
+  } catch (error) {
+    console.error('Error:', error)
+    alert('Đã có lỗi xảy ra. Vui lòng thử lại.')
+  }
 }

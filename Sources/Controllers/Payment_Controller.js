@@ -183,4 +183,29 @@ export const payment_Controller = {
       res.redirect('/')
     }
   },
+
+  // API: Hủy giao dịch tạm
+  cancelHold: async (req, res) => {
+    try {
+      const { orderId } = req.params
+      const MaKH = req.user?.MaKH || req.user?.id
+
+      if (!MaKH) {
+        return res.status(401).json({ success: false, message: 'Vui lòng đăng nhập' })
+      }
+
+      if (!orderId) {
+        return res.status(400).json({ success: false, message: 'Thiếu orderId' })
+      }
+
+      await payment_Services.cancelHold_Service(orderId, MaKH)
+      return res.status(200).json({ success: true, message: 'Hủy giao dịch thành công' })
+    } catch (error) {
+      logger.error('Controller: Lỗi hủy giao dịch tạm', error)
+      return res.status(error.statusCode || 500).json({
+        success: false,
+        message: error.message || 'Lỗi hủy giao dịch',
+      })
+    }
+  },
 }

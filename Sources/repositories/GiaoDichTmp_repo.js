@@ -165,7 +165,7 @@ export const giaoDichTmp_Repo = {
   getServicesByMaGD_Repo: async (MaGD) => {
     const db = await pool;
     const [rows] = await db.query(
-      `SELECT MaDV, SoLuong, Gia FROM GIAODICH_TMP_DV 
+      `SELECT MaDV, SoLuong, Gia FROM GIAODICH_TMP 
        WHERE MaGD = ? AND TrangThai = 'PENDING'`,
       [MaGD]
     );
@@ -174,7 +174,7 @@ export const giaoDichTmp_Repo = {
   
   deleteServicesByMaGD_Repo: async (MaGD) => {
     const db = await pool;
-    await db.query(`DELETE FROM GIAODICH_TMP_DV WHERE MaGD = ?`, [MaGD]);
+    await db.query(`DELETE FROM GIAODICH_TMP WHERE MaGD = ?`, [MaGD]);
     return true;
   },
   

@@ -388,4 +388,32 @@ export const payment_Services = {
       throw error
     }
   },
+
+  /** 🚫 Hủy giao dịch tạm */
+  cancelHold_Service: async (MaGD, MaKH) => {
+    try {
+      // Kiểm tra giao dịch có tồn tại và thuộc về user không
+      const tmpSeats = await giaoDichTmp_Repo.getByMaGD_Repo(MaGD)
+      if (!tmpSeats || tmpSeats.length === 0) {
+        throw new ApiError('Không tìm thấy giao dịch tạm', 404)
+      }
+
+      // Kiểm tra quyền: chỉ user sở hữu mới được hủy
+      if (tmpSeats[0].MaKH !== MaKH) {
+        throw new ApiError('Không có quyền hủy giao dịch này', 403)
+      }
+
+      // Hủy giao dịch tạm
+      await giaoDichTmp_Repo.cancelByOrderId_Repo(MaGD)
+      
+      // Xóa dịch vụ tạm nếu có
+      await giaoDichTmp_Repo.deleteServicesByMaGD_Repo(MaGD)
+
+      logger.info(`🚫 Đã hủy giao dịch tạm ${MaGD} của khách hàng ${MaKH}`)
+      return { success: true }
+    } catch (error) {
+      logger.error(`❌ Lỗi hủy giao dịch tạm ${MaGD}`, error)
+      throw error
+    }
+  },
 }

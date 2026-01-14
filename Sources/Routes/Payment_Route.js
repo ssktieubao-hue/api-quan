@@ -16,6 +16,9 @@ router.post('/demo-complete', authenticate, payment_Controller.demoComplete)
 // DEMO: lấy thông tin giao dịch tạm để thanh toán lại
 router.get('/pending/:orderId', authenticate, payment_Controller.getPendingInfo)
 
+// API: Hủy giao dịch tạm
+router.post('/cancel/:orderId', authenticate, payment_Controller.cancelHold)
+
 // API: Callback từ VNPay (không cần đăng nhập)
 router.get('/vnpay-return', payment_Controller.paymentReturn)
 
