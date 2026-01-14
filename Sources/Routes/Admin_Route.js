@@ -17,11 +17,20 @@ const router = express.Router();
 // Áp dụng cho toàn bộ /admin
 router.use(requireAdminArea, loadUserPermissions);
 
+// Helper function để render với các biến mặc định
+const renderAdmin = (res, view, data = {}) => {
+  res.render(view, {
+    user: res.req.session.user,
+    userPermissions: res.locals.userPermissions || [],
+    permissions: res.locals.userPermissions || [],
+    ...data,
+  });
+};
+
 // Trang dashboard chính
 router.get('/', (req, res) => {
-  res.render('admin/index', {
-    user: req.session.user,
-    permissions: res.locals.userPermissions || [],
+  renderAdmin(res, 'admin/index', {
+    currentPage: 'index',
   });
 });
 
@@ -40,11 +49,12 @@ router.get('/staff', requirePermission('USER_MANAGE'), async (req, res) => {
     selectedPermissions = perms.map((p) => p.MaQuyen);
   }
 
-  res.render('admin/staff', {
+  renderAdmin(res, 'admin/staff', {
     staffList,
     allPermissions,
     selectedId,
     selectedPermissions,
+    currentPage: 'staff',
   });
 });
 
@@ -126,7 +136,7 @@ router.get('/movies', requirePermission('MOVIE_MANAGE'), async (req, res) => {
     [...params, pageSize, offset]
   );
 
-  res.render('admin/movies', {
+  renderAdmin(res, 'admin/movies', {
     films,
     search,
     type,
@@ -134,6 +144,7 @@ router.get('/movies', requirePermission('MOVIE_MANAGE'), async (req, res) => {
     total,
     pageSize,
     editFilm: null,
+    currentPage: 'movies',
   });
 });
 
@@ -158,7 +169,7 @@ router.get('/movies/:id/edit', requirePermission('MOVIE_MANAGE'), async (req, re
   const id = Number(req.params.id);
   const [films] = await db.query('SELECT * FROM PHIM ORDER BY MaPhim DESC LIMIT 50');
   const editFilm = films.find(f => f.MaPhim === id) || null;
-  res.render('admin/movies', {
+  renderAdmin(res, 'admin/movies', {
     films,
     search: '',
     type: '',
@@ -166,6 +177,7 @@ router.get('/movies/:id/edit', requirePermission('MOVIE_MANAGE'), async (req, re
     total: films.length,
     pageSize: 50,
     editFilm,
+    currentPage: 'movies',
   });
 });
 
@@ -203,7 +215,7 @@ router.get('/rooms', requirePermission('ROOM_MANAGE'), async (req, res) => {
     params.push(`%${search}%`);
   }
   const [rooms] = await db.query(`SELECT * FROM PHONGCHIEU ${where} ORDER BY MaPhong ASC`, params);
-  res.render('admin/rooms', { rooms, error: null, search, editRoom: null });
+  renderAdmin(res, 'admin/rooms', { rooms, error: null, search, editRoom: null, currentPage: 'rooms' });
 });
 
 router.post('/rooms/add', requirePermission('ROOM_MANAGE'), async (req, res) => {
@@ -213,7 +225,7 @@ router.post('/rooms/add', requirePermission('ROOM_MANAGE'), async (req, res) => 
     res.redirect('/admin/rooms');
   } catch (err) {
     const rooms = await phongChieu_Repo.getAll_Repo();
-    res.render('admin/rooms', { rooms, error: err.message || 'Lỗi tạo phòng chiếu', search: '', editRoom: null });
+    renderAdmin(res, 'admin/rooms', { rooms, error: err.message || 'Lỗi tạo phòng chiếu', search: '', editRoom: null, currentPage: 'rooms' });
   }
 });
 
@@ -221,7 +233,7 @@ router.get('/rooms/:id/edit', requirePermission('ROOM_MANAGE'), async (req, res)
   const id = Number(req.params.id);
   const rooms = await phongChieu_Repo.getAll_Repo();
   const editRoom = rooms.find(r => r.MaPhong === id) || null;
-  res.render('admin/rooms', { rooms, error: null, search: '', editRoom });
+  renderAdmin(res, 'admin/rooms', { rooms, error: null, search: '', editRoom, currentPage: 'rooms' });
 });
 
 router.post('/rooms/:id/update', requirePermission('ROOM_MANAGE'), async (req, res) => {
@@ -238,7 +250,7 @@ router.post('/rooms/:id/delete', requirePermission('ROOM_MANAGE'), async (req, r
     res.redirect('/admin/rooms');
   } catch (err) {
     const rooms = await phongChieu_Repo.getAll_Repo();
-    res.render('admin/rooms', { rooms, error: err.message || 'Không thể xóa phòng chiếu', search: '', editRoom: null });
+    renderAdmin(res, 'admin/rooms', { rooms, error: err.message || 'Không thể xóa phòng chiếu', search: '', editRoom: null, currentPage: 'rooms' });
   }
 });
 
@@ -266,7 +278,7 @@ router.get('/showtimes', requirePermission('SHOWTIME_MANAGE'), async (req, res) 
     params
   );
 
-  res.render('admin/showtimes', { showtimes, films, rooms, error: null, filmId, editShowtime: null });
+  renderAdmin(res, 'admin/showtimes', { showtimes, films, rooms, error: null, filmId, editShowtime: null, currentPage: 'showtimes' });
 });
 
 router.post('/showtimes/add', requirePermission('SHOWTIME_MANAGE'), async (req, res) => {
@@ -286,7 +298,7 @@ router.post('/showtimes/add', requirePermission('SHOWTIME_MANAGE'), async (req, 
       films_Repo.getAllFilms_Repo(),
       phongChieu_Repo.getAll_Repo(),
     ]);
-    res.render('admin/showtimes', { showtimes, films, rooms, error: err.message || 'Lỗi tạo lịch chiếu', filmId: null, editShowtime: null });
+    renderAdmin(res, 'admin/showtimes', { showtimes, films, rooms, error: err.message || 'Lỗi tạo lịch chiếu', filmId: null, editShowtime: null, currentPage: 'showtimes' });
   }
 });
 
@@ -298,7 +310,7 @@ router.get('/showtimes/:id/edit', requirePermission('SHOWTIME_MANAGE'), async (r
     phongChieu_Repo.getAll_Repo(),
   ]);
   const editShowtime = showtimes.find(s => s.MaLich === id) || null;
-  res.render('admin/showtimes', { showtimes, films, rooms, error: null, filmId: null, editShowtime });
+  renderAdmin(res, 'admin/showtimes', { showtimes, films, rooms, error: null, filmId: null, editShowtime, currentPage: 'showtimes' });
 });
 
 router.post('/showtimes/:id/update', requirePermission('SHOWTIME_MANAGE'), async (req, res) => {
@@ -319,7 +331,7 @@ router.post('/showtimes/:id/delete', requirePermission('SHOWTIME_MANAGE'), async
       films_Repo.getAllFilms_Repo(),
       phongChieu_Repo.getAll_Repo(),
     ]);
-    res.render('admin/showtimes', { showtimes, films, rooms, error: err.message || 'Không thể xóa lịch chiếu', filmId: null, editShowtime: null });
+    renderAdmin(res, 'admin/showtimes', { showtimes, films, rooms, error: err.message || 'Không thể xóa lịch chiếu', filmId: null, editShowtime: null, currentPage: 'showtimes' });
   }
 });
 
@@ -339,7 +351,7 @@ router.get('/services', requirePermission('SERVICE_MANAGE'), async (req, res) =>
     params.push(Number(status));
   }
   const [services] = await db.query(`SELECT * FROM DICHVU ${where} ORDER BY MaDV DESC`, params);
-  res.render('admin/services', { services, error: null, search, status, editService: null });
+  renderAdmin(res, 'admin/services', { services, error: null, search, status, editService: null, currentPage: 'services' });
 });
 
 router.post('/services/add', requirePermission('SERVICE_MANAGE'), async (req, res) => {
@@ -357,7 +369,7 @@ router.get('/services/:id/edit', requirePermission('SERVICE_MANAGE'), async (req
   const id = Number(req.params.id);
   const [services] = await db.query('SELECT * FROM DICHVU ORDER BY MaDV DESC');
   const editService = services.find(s => s.MaDV === id) || null;
-  res.render('admin/services', { services, error: null, search: '', status: '', editService });
+  renderAdmin(res, 'admin/services', { services, error: null, search: '', status: '', editService, currentPage: 'services' });
 });
 
 router.post('/services/:id/update', requirePermission('SERVICE_MANAGE'), async (req, res) => {
@@ -384,7 +396,7 @@ router.post('/services/:id/toggle', requirePermission('SERVICE_MANAGE'), async (
 /* ========== QUẢN LÝ VÉ (TICKET_VIEW) ========== */
 router.get('/tickets', requirePermission('TICKET_VIEW'), async (req, res) => {
   const tickets = await ve_Repo.getAll_Repo(null);
-  res.render('admin/tickets', { tickets });
+  renderAdmin(res, 'admin/tickets', { tickets, currentPage: 'tickets' });
 });
 
 /* ========== QUẢN LÝ GIAO DỊCH TẠM (TMP_TRANSACTION_VIEW) ========== */
@@ -399,7 +411,7 @@ router.get('/tmp-transactions', requirePermission('TMP_TRANSACTION_VIEW'), async
     JOIN PHIM phim ON lc.MaPhim = phim.MaPhim
     ORDER BY tmp.NgayTao DESC
   `);
-  res.render('admin/tmp-transactions', { transactions: rows });
+  renderAdmin(res, 'admin/tmp-transactions', { transactions: rows, currentPage: 'tmp-transactions' });
 });
 
 /* ========== BÁO CÁO DOANH THU (REPORT_VIEW) ========== */
@@ -427,7 +439,7 @@ router.get('/reports', requirePermission('REPORT_VIEW'), async (req, res) => {
     LIMIT 10
   `);
 
-  res.render('admin/reports', { byDate, byFilm });
+  renderAdmin(res, 'admin/reports', { byDate, byFilm, currentPage: 'reports' });
 });
 
 export default router;
